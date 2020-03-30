@@ -2,7 +2,7 @@
 
 Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network
 
-## 摘要：
+# 摘要：
 
 >Despite the breakthroughs in accuracy and speed of single image super-resolution using faster and deeper convolutional neural networks, one central problem remains largely unsolved: how do we recover the **ﬁner** texture details when we super-resolve at large upscaling factors? During image downsampling information is lost, making superresolution a highly **ill-posed** inverse problem with a large set of possible solutions. 
 
@@ -19,6 +19,7 @@ Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversa
 > In addition, we use a content loss function motivated by perceptual similarity instead of similarity in pixel space. Trained on 350K images using the perceptual loss function, our **deep residual network** was able to recover photo-realistic textures from heavily downsampled images on public benchmarks.
 
 而且，我们使用感知相似性来激活内容损失，而不是使用像素空间相似性。使用35万张图像对感知损失函数进行训练后，我们的深度残差网络（ResNet）能够从在公共基准上进行大量降采样后的图像恢复出真实图像的纹理。
+
 |               单词                |      含义      |
 | :-------------------------------: | :------------: |
 |               finer               |    更精细的    |
@@ -35,25 +36,113 @@ Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversa
 |             residual              |  剩余的、残差  |
 |       deep residual network       |  深度残差网络  |
 
-## 1、引言
+# 1、引言
 
 >The highly challenging task of estimating a high resolution (HR), ideally perceptually superior image from its low-resolution (LR) counterpart is referred to as super-resolution(SR).  Despite the difﬁculty of the problem, research into SR received **substantial** attention from within the computer vision community. The wide range of applications [36] includes face recognition in **surveillance** videos [61], video streaming and medical applications. 
 
 生成高分辨率图像是一项极具挑战性的任务，从低分辨率图像（LR）得到对应的高分辨率图像（HR）叫做超分辨率（SR）。尽管很难，SR的研究依然受到了计算机视觉界的大量关注，并广泛应用于监控视频或视频流中的面部识别和医疗领域。
-|     单词     |          含义          |
-| :----------: | :--------------------: |
-| substantial  |         大量的         |
-| surveillance |       监督、监视       |
-|  ambiguity   | 含糊、不明确、模棱两可 |
-|              |                        |
-|              |                        |
-|              |                        |
-|              |                        |
-|              |                        |
-|              |                        |
 
-![image-20200325163703703](Untitled.assets/image-20200325163703703.png)
+> One major difﬁculty when estimating the HR image is the **ambiguity** of solutions to the underdetermined SR problem. The ill-posed nature of the SR problem is particularly pronounced for high downsampling factors, for which texture detail in the reconstructed SR images is typically absent. Assumptions about the data have to be made to approximate the HR image, such as exploiting image **redundancies** or employing speciﬁcally trained feature models. 
 
-> One major difﬁculty when estimating the HR image is the ambiguity of solutions to the underdetermined SR problem. Theill-posednatureoftheSRproblemisparticularly pronounced for high downsampling factors, for which texture detail in the reconstructed SR images is typically absent. Assumptions about the data have to be made to approximatetheHRimage,suchasexploitingimageredundancies or employing speciﬁcally trained feature models. 
+生成高分辨率图像的一个主要困难是如何确定模糊区域的高分辨率内容。这种病态问题的特性尤其表现在大幅度降采样的图像上，他们的纹理细节在重建后的高分辨率图像中通常都会丢失。为了得到可能的高分辨率图像，必须要对数据进行假设，例如挖掘图像的冗余信息或者使用特别训练的特征模型。
 
-生成高分辨率图像的一个主要困难是如何解决模糊区域的
+>Over the last few decades substantial advances have been made in image SR [36, 53], with early methods based on **interpolation**, simple image features (e.g. edges) or statistical image **prior**s. Later **example-based** methods very successfully detected and exploited patch correspondences within a training database or calculated optimized dictionaries allowing for high-detail data representation. While of good accuracy, the involved optimization procedures for both patch detection and sparse coding are computationally intensive. More advanced methods **formulate** image-based SR as a **regression** problem that can be **tackle**d for example with Random Forests [39]. The recent rise of convolutional neural networks (CNNs) also had a substantial impact on image SR [8], not only improving the state of the art with respect to accuracy but also computational speed, enabling real-time SR for 2D video frames [40]. 
+
+在过去的近几十年里，图像超分辨率领域有了巨大的进步，早期的一些方法是基于插值、简单的图像特征（例如边缘）或者统计图像的先验知识。后来基于样本的方法非常成功地在一个训练数据库或经过计算优化的字典中检测和利用各区块对应来获得更高精度的数据显示。但尽管精度很高，其中包含的优化过程对于区块检测和稀疏编码来说计算量都很大。更多先进的方法明确的把基于图片的超分辨率重建定义为例如可以被随机森林解决的回归问题。最近逐渐增多的卷积神经网络（CNNs）也在图像超分辨率上有着大量影响，提高了人们所期望的精度和计算速度，而且实现了对二维视频的实时超分辨率。
+
+> The optimization target of supervised SR algorithms is usually the minimization of the mean squared error (MSE) between the recovered HR image and the ground truth. This is convenient as minimizing MSE also maximizes the peak signal to noise ratio (PSNR), which is a common measure used to evaluate and compare SR algorithms[53]. However, the ability of MSE(andPSNR) to capture perceptually relevant differences, such as high texture detail, is very limited as they are deﬁned based on pixel-wise image differences [52, 49, 21]. This is illustrated in Figure 2, where highest PSNR does not necessarily reﬂect the perceptually better SR result. 
+
+监督超分辨率理论的优化目标通常是最小化恢复得到的高分辨率图像和真实图像之间的均方差（MSE）。最小化均方差的同时最大化峰值信号比（PSNR）很方便，峰值信号比是一种常用的评估和对比超分辨率方法的方式。然而，MSE和PSNR捕捉感知相关的差异（例如高质感的细节）能力非常局限，因为他们是基于像素差异定义的。如图二所示，最大的PSNR不一定就是感官上最高的超分辨率结果。
+
+![image-20200330134042694](SRGAN论文学习.assets/image-20200330134042694.png)
+
+> The perceptual difference between the super-resolved images and original images means that the super-resolved images are not photo-realistic as deﬁned by Ferwerda [12]. Photo-realistic image super-resolution techniques including [44, 60, 57] have been focusing on minimizing the perceptual differences by using detail **synthesis**, a multi-scale dictionary or a structure aware loss function. 
+
+超分辨率图像和原始图像感官上的不同意味着生成的图像不够真实（Ferwerda 的定义）。包括[44,60,57]在内的能够生成真实图像的超分辨率技术一直致力于通过使用细节合成、多尺度字典或结构感知损失函数来最小化感知差异。
+
+> In this work we propose super-resolution generative adversarial network(SRGAN) for which we employ a deep residual network and **diverge** from MSE as the **sole** optimization target. Different from previous works, we deﬁne a **novel** perceptual loss using high-level feature maps of the VGG network [41, 26] combined with a discriminator that encourages solutions perceptually hard to distinguish from the HR reference images. An example of a photo-realistic image that was super-resolved from a 4× downsampling factor using SRGAN is shown in Figure 1. 
+
+本文中我们提出的超分辨率生成对抗网络使用了深度残差网络，并把MSE偏离作为唯一的优化目标。和以前的方法不同，我们使用VGG网络的高级特征图结合鉴别器定义了一个新的感知损失，来鼓励生成的图像在视觉上难以与高分辨率图像区分。图1是一个从4倍降采样使用SRGAN恢复出来真实图像的例子。
+
+<img src="SRGAN论文学习.assets/image-20200325163703703.png" alt="image-20200325163703703" style="zoom:67%;" />
+
+|          单词           |              含义              |
+| :---------------------: | :----------------------------: |
+|       substantial       |             大量的             |
+|      surveillance       |           监督、监视           |
+|        ambiguity        |     含糊、不明确、模棱两可     |
+| redundancy = redundance |              冗余              |
+|      interpolation      |           插入、插值           |
+|          prior          | （时间、顺序等）先前的；优先的 |
+|      example-based      |           基于样本的           |
+|         tackle          |           应付、处理           |
+|        formulate        |  规划、用公式表示、明确地表达  |
+|       regression        |           回归、退化           |
+|        synthesis        |              合成              |
+|         diverge         |           分叉、偏离           |
+|          sole           |         单独的、唯一的         |
+|          novel          |         新奇的、异常的         |
+
+## 1.1相关研究
+
+### 1.1.1图像超分辨率
+
+>There is a vast amount of literature and research that focuses on the problem of recovering high-resolution images from a low-resolution observation. Recent overview articles include Nasrollahi and Moeslund [36] or Yang et al. [53]. Here we will focus on single image super-resolution(SISR) and will not further discuss approaches that recover HR images from multiple images, such as object images acquired from varying view points or **temporal sequence**s of **image frame**s [4, 11]. 
+
+有大量的文献和研究致力于从低分辨率影像恢复高分辨率影像。近期的综述文章包括Nasrollahi 、Moeslund 或Yang 等人。在这里我们将着眼于单张图像超分辨率（SISR），并且不会深入讨论从多张图片中恢复出高分辨率图像的方法，例如从不同的视点或图像帧的时间序列获取的目标图像。
+
+> Prediction-based methods are among the ﬁrst and more **straightforward** methods to tackle SISR. While these **ﬁltering** approaches, e.g. linear, **bicubic** or **Lanczos** [10] ﬁltering, can be very fast, they oversimplify the SISR problem and usually **yield** overly smooth solutions failing to recover the high-frequency image information. **Interpolation** methods that put particular focus on edge-preservation have been proposed in for example Allebach and Wong [1] or Li et al. [32].
+
+基于预测的方法是解决单图像超分辨率的第一个也是最直接的方法。虽然这些滤波方法，例如线性、双三次或兰索斯滤波，速度非常快，但是过度简化了单图像超分辨率问题，并且通常生成过度平滑的结果并且无法恢复出图像的高频信息。插值方法通常特别注意边缘信息的保护，例如Allebach和Wong或者Li等人所提出的。
+
+> More powerful approaches aim to establish a complex mapping between low- and high-resolution image information and usually rely on training data. 
+
+很多厉害的致力于在低分辨率和高分辨率影像之间建立复杂映射的方法通常依赖于训练数据。
+
+> Many methods that are based on example-pairs rely on LR training patches for which the corresponding HR counterparts are known. Early work was presented by Freeman et al. [14, 13]. Related approaches to the SR problem originate in compressed sensing and aim to estimate a sparse patch representation with respect to an over-complete dictionary [54, 9, 59]. In Glasner et al. [17] the authors exploit patch redundancies across scales within the image to drive the SR. This paradigm of self-similarity is also employed in Huang et al. [24], where insufﬁciently descriptive self dictionaries are extended by further allowing for small transformations and shape variations.
+
+很多基于样本匹配的方法依赖于低分辨率的训练，而且对应的高分辨率区块已知。早期的工作是由Freeman等人提出的。超分辨率问题相关的方法
+
+
+
+
+
+> To reconstruct realistic texture detail while avoiding edge artifacts, Tai et al. [44] combine an edge-directed SR algorithm based on a gradient proﬁle prior [42] with the beneﬁts of learning-based detail synthesis. Zhang et al. [60] propose a multi-scale dictionary to capture redundancies of similar image patches at different scales with the goal to enhance visual details. To super-resolve landmark images, Yue et al. [57] retrieve correlating HR images with similar content from the web and propose a structure-aware matching criterion for alignment. 
+
+
+
+> Neighborhood embedding approaches upsample a given LR image patch by ﬁnding similar LR training patches in a lowdimensionalmanifoldandcombiningtheircorresponding HR patches for reconstruction [45, 46]. In Kim and Kwon [28] the authors emphasize the tendency of neighborhood approaches to overﬁt and learn a more general mapfromlowtohigh-resolutionimagesfromexamplepairs using kernel ridge regression. 
+
+
+
+> The regression problem can also be solved directly with Random Forests and thus the explicit training of a sparse dictionaryisavoided[39]. InDaietal. [5]theauthorslearn a multitude of patch-speciﬁc regressors during training and select the most appropriate regressors for a given LR patch during testing using kNN. 
+
+
+
+> Recently CNN based SR algorithms have shown excellent performance. In Wang et al. [50] the authors encode a sparse representation prior into their feed-forward network architecture based on the learned iterative shrinkage and thresholding algorithm (LISTA) [19]. Dong et al. [7, 8] used bicubic interpolation to upscale an input image and trained a three layer deep fully convolutional network endto-end to achieve state of the art SR performance.
+
+
+
+> Subsequently, it was shown that enabling the network to learn the upscaling ﬁlters directly can further increase performance both in terms of accuracy and speed [40, 48]. In Shi et al. [40] the upscaling is only performed in the last layerofthenetworkavoidingexpensivecomputationsinthe high-resolution space of the SR image. With their deeplyrecursive convolutional network (DRCN), Kim et al. [27] presented a highly performant architecture that allows for long-range pixel dependencies while keeping the number of model parameters small. Of particular relevance in the context of our paper is the work by Johnson et al. [26], who rely on a loss function closer to perceptual similarity to recover visually more convincing HR images.
+
+
+
+
+
+|       单词        |          含义          |
+| :---------------: | :--------------------: |
+|     temporal      |     暂时的、当时的     |
+| temporal sequence |        时间序列        |
+|    image frame    |         图像帧         |
+|  straightforward  | 简单的、明确的、坦率的 |
+|     ﬁltering      |          滤波          |
+|      bicubic      |        双三次的        |
+|      Lanczos      |         兰索斯         |
+|       yield       |       产出、出产       |
+|   Interpolation   |          插值          |
+|     originate     |    引起、创作、发源    |
+|                   |                        |
+|                   |                        |
+|                   |                        |
+|                   |                        |
+
