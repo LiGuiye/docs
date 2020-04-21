@@ -1,4 +1,4 @@
-# SRGAN
+# **SRGAN**
 
 Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network
 
@@ -12,9 +12,9 @@ Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversa
 
 因此，超分辨方法的最优化主要是由目标函数的选择所决定。最近的研究很大一部分都着眼于将重建的均方误差（MSE）最小化，得到的结果具有很高的峰值信噪比（PSNR），但是通常过于平滑，缺少了高频信息，导致在视觉上效果不太尽如人意。
 
-> In this paper, we present super resolution generative adversarial network (SRGAN). To our knowledge, it is the ﬁrst framework **capable** of recovering photo-realistic natural images from 4× downsampling. To achieve this, we propose a perceptual loss function which consists of an adversarial loss and a content loss. The **adversarial** loss pushes our solution to the natural image manifold using a **discriminator** network that is trained to differentiate between the super-resolved images and original photo-realistic images.
+> In this paper, we present super resolution generative adversarial network (SRGAN). To our knowledge, it is the ﬁrst framework **capable** of recovering photo-realistic natural images from 4× downsampling. To achieve this, we propose a perceptual loss function which consists of an adversarial loss and a content loss. The **adversarial** loss pushes our solution to the natural image **manifold** using a **discriminator** network that is trained to differentiate between the super-resolved images and original photo-realistic images.
 
-在本文中，我们提出了超分辨率生成对抗网络（SRGAN）。据我们所知，这是第一种在4倍降采样后仍能恢复真实自然图像的框架。为了实现该效果，我们使用了一种感知损失函数，其包括对抗损失（adversarial loss）和内容损失（content less）。对抗损失使用鉴别网络（discriminator network）让我们的方法可以生成更加自然的图像，这种鉴别网络被训练来区分超分辨率图像和原始真实图像。
+在本文中，我们提出了超分辨率生成对抗网络（SRGAN）。据我们所知，这是第一种在4倍降采样后仍能恢复真实自然图像的框架。为了实现该效果，我们使用了一种感知损失函数，其包括对抗损失（adversarial loss）和内容损失（content less）。对抗损失使用鉴别网络（discriminator network）让我们的方法可以生成更加自然的图像流形，这种鉴别网络被训练来区分超分辨率图像和原始真实图像。
 
 > In addition, we use a content loss function motivated by perceptual similarity instead of similarity in pixel space. Trained on 350K images using the perceptual loss function, our **deep residual network** was able to recover photo-realistic textures from heavily downsampled images on public benchmarks.
 
@@ -35,6 +35,7 @@ Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversa
 |           discriminator           |     判别器     |
 |             residual              |  剩余的、残差  |
 |       deep residual network       |  深度残差网络  |
+|             manifold              |      流形      |
 
 # 1、引言
 
@@ -99,50 +100,61 @@ Paper：Photo-Realistic Single Image Super-Resolution Using a Generative Adversa
 
 很多厉害的致力于在低分辨率和高分辨率影像之间建立复杂映射的方法通常依赖于训练数据。
 
-> Many methods that are based on example-pairs rely on LR training patches for which the corresponding HR counterparts are known. Early work was presented by Freeman et al. [14, 13]. Related approaches to the SR problem originate in compressed sensing and aim to estimate a sparse patch representation with respect to an over-complete dictionary [54, 9, 59]. In Glasner et al. [17] the authors exploit patch redundancies across scales within the image to drive the SR. This paradigm of self-similarity is also employed in Huang et al. [24], where insufﬁciently descriptive self dictionaries are extended by further allowing for small transformations and shape variations.
+> Many methods that are based on example-pairs rely on LR training patches for which the corresponding HR counterparts are known. Early work was presented by Freeman et al. [14, 13]. Related approaches to the SR problem **originate** in compressed sensing and aim to estimate a sparse patch representation with respect to an over-complete dictionary [54, 9, 59]. In Glasner et al. [17] the authors exploit patch redundancies across scales within the image to drive the SR. This **paradigm** of self-similarity is also employed in Huang et al. [24], where insufﬁciently descriptive self dictionaries are extended by further allowing for small transformations and shape variations.
 
-很多基于样本匹配的方法依赖于低分辨率的训练，而且对应的高分辨率区块已知。早期的工作是由Freeman等人提出的。超分辨率问题相关的方法
+很多基于样本匹配的方法依赖于低分辨率的训练，而且对应的高分辨率区块已知。早期的工作是由Freeman等人提出的。SR问题的相关方法起源于压缩感知，目的是利用完备的字典来估计稀疏表示。在Glasner 等人提出的论文中，作者利用图像中跨尺度的区块冗余来实现超分辨率。这种自相关性的典范也被用于Huang等人的文章中，描述不充分的字典被小的转换和形状变化所扩展。
 
+> To reconstruct realistic texture detail while avoiding edge **artifact**s, Tai et al. [44] combine an edge-directed SR algorithm based on a **gradient** **proﬁle** prior [42] with the beneﬁts of learning-based detail synthesis. Zhang et al. [60] propose a multi-scale dictionary to capture redundancies of similar image patches at different scales with the goal to enhance visual details. To **super-resolve** landmark images, Yue et al. [57] **retrieve** correlating HR images with similar content from the web and propose a structure-aware matching **criterion** for **alignment**. 
 
+为了重建出真实的纹理细节并且避免人造边缘信息，Tai等人把基于梯度剖面先验知识的边缘导向SR方法和基于学习的细节合成方法的优点结合了起来。Zhang等人提出了一种多尺度的字典来捕捉相似图像对在不同尺度的多余信息，希望能够提高视觉细节。为了超分辨率地标图像，Yue等人使用网络上的相似内容来恢复对应的高分辨率图像信息，并且提出了一种基于结构感知的对齐匹配标准。
 
+> Neighborhood **embed**ding approaches upsample a given LR image patch by ﬁnding similar LR training patches in a low dimensional manifold and combining their corresponding HR patches for reconstruction [45, 46]. In Kim and Kwon [28] the authors **emphasize** the tendency of neighborhood approaches to overﬁt and learn a more general map from low to high-resolution images from example pairs using **kernel ridge regression**. 
 
+邻域插值方法针对给定低分辨率影像在低维流形中寻找相似的低分训练区块并结合他们对应的高分区块来实现重建。在Kim和Kwon的文章中，作者强调了邻域插值方法过拟合和在样本对中使用核岭回归从低分到高分图像学习的映射过于宽泛的问题。
 
-> To reconstruct realistic texture detail while avoiding edge artifacts, Tai et al. [44] combine an edge-directed SR algorithm based on a gradient proﬁle prior [42] with the beneﬁts of learning-based detail synthesis. Zhang et al. [60] propose a multi-scale dictionary to capture redundancies of similar image patches at different scales with the goal to enhance visual details. To super-resolve landmark images, Yue et al. [57] retrieve correlating HR images with similar content from the web and propose a structure-aware matching criterion for alignment. 
+> The regression problem can also be solved directly with Random Forests and thus the explicit training of a sparse dictionary is avoided[39]. In Daietal. [5] the authors learn a multitude of patch-speciﬁc **regressor**s during training and select the most appropriate regressors for a given LR patch during testing using kNN. 
 
+这种回归问题能够被随机森林直接解决，训练稀疏字典也可以避免。在Daietal的文章中，作者在训练中学习了大量特定区块的回归量，并在使用kNN测试时为给定的LR区块选择了最合适的回归量。
 
+> Recently CNN based SR algorithms have shown excellent performance. In Wang et al. [50] the authors encode a sparse representation prior into their **feed-forward** network architecture based on the learned **iterative** **shrinkage** and **threshold**ing algorithm (LISTA) [19]. Dong et al. [7, 8] used bicubic interpolation to upscale an input image and trained a three layer deep fully convolutional network end to-end to achieve state of the art SR performance.
 
-> Neighborhood embedding approaches upsample a given LR image patch by ﬁnding similar LR training patches in a lowdimensionalmanifoldandcombiningtheircorresponding HR patches for reconstruction [45, 46]. In Kim and Kwon [28] the authors emphasize the tendency of neighborhood approaches to overﬁt and learn a more general mapfromlowtohigh-resolutionimagesfromexamplepairs using kernel ridge regression. 
+最近基于CNN的超分辨率方法表现很出色。在Wang等人的文章中，作者在他们基于学习迭代收缩和阈值算法的前馈网络结构中编码了一种先验稀疏表示。Dong等人使用双三次插值来上采样输入图像，并训练了一个端对端的三层深度全卷积网络来实现最优秀的超分辨率效果。
 
+> **Subsequently**, it was shown that enabling the network to learn the **upscaling** ﬁlters directly can further increase performance both in terms of accuracy and speed [40, 48]. In Shi et al. [40] the upscaling is only performed in the last layer of the network avoiding expensive computations in the high-resolution space of the SR image. With their deeply **recursive** convolutional network (DRCN), Kim et al. [27] presented a highly performant architecture that allows for long-range pixel dependencies while keeping the number of model parameters small. Of particular relevance in the context of our paper is the work by Johnson et al. [26], who rely on a loss function closer to perceptual similarity to recover visually more convincing HR images.
 
-
-> The regression problem can also be solved directly with Random Forests and thus the explicit training of a sparse dictionaryisavoided[39]. InDaietal. [5]theauthorslearn a multitude of patch-speciﬁc regressors during training and select the most appropriate regressors for a given LR patch during testing using kNN. 
-
-
-
-> Recently CNN based SR algorithms have shown excellent performance. In Wang et al. [50] the authors encode a sparse representation prior into their feed-forward network architecture based on the learned iterative shrinkage and thresholding algorithm (LISTA) [19]. Dong et al. [7, 8] used bicubic interpolation to upscale an input image and trained a three layer deep fully convolutional network endto-end to achieve state of the art SR performance.
-
-
-
-> Subsequently, it was shown that enabling the network to learn the upscaling ﬁlters directly can further increase performance both in terms of accuracy and speed [40, 48]. In Shi et al. [40] the upscaling is only performed in the last layerofthenetworkavoidingexpensivecomputationsinthe high-resolution space of the SR image. With their deeplyrecursive convolutional network (DRCN), Kim et al. [27] presented a highly performant architecture that allows for long-range pixel dependencies while keeping the number of model parameters small. Of particular relevance in the context of our paper is the work by Johnson et al. [26], who rely on a loss function closer to perceptual similarity to recover visually more convincing HR images.
+后来结果表明，使网络能够直接学习放大滤波器可以在精度和速度方面进一步提高性能。在Shi等人的论文中，放大滤波器只在网络的最后一层有用，可以避免超分辨率过程中高分辨率空间的大量计算。在深度递归卷积网络（DRCN）中，Kim等人提出了一种高性能的结构，可以保证少量模型参数的同时具有广泛的像素相关性。在Johnson等人的论文中，
 
 
 
-
-
-|       单词        |          含义          |
-| :---------------: | :--------------------: |
-|     temporal      |     暂时的、当时的     |
-| temporal sequence |        时间序列        |
-|    image frame    |         图像帧         |
-|  straightforward  | 简单的、明确的、坦率的 |
-|     ﬁltering      |          滤波          |
-|      bicubic      |        双三次的        |
-|      Lanczos      |         兰索斯         |
-|       yield       |       产出、出产       |
-|   Interpolation   |          插值          |
-|     originate     |    引起、创作、发源    |
-|                   |                        |
-|                   |                        |
-|                   |                        |
-|                   |                        |
+|          单词           |          含义          |
+| :---------------------: | :--------------------: |
+|        temporal         |     暂时的、当时的     |
+|    temporal sequence    |        时间序列        |
+|       image frame       |         图像帧         |
+|     straightforward     | 简单的、明确的、坦率的 |
+|        ﬁltering         |          滤波          |
+|         bicubic         |        双三次的        |
+|         Lanczos         |         兰索斯         |
+|          yield          |       产出、出产       |
+|      Interpolation      |          插值          |
+|        originate        |    引起、创作、发源    |
+|        paradigm         |          范例          |
+|        artifact         |        人工产品        |
+|        gradient         |          梯度          |
+|         profile         |          轮廓          |
+|      super-resolve      |        超分辨率        |
+|        retrieve         |       检索、恢复       |
+|        criterion        |          标准          |
+|        alignment        |       队列、对齐       |
+|          embed          |      嵌入、使插入      |
+|        emphasize        |       着重、强调       |
+| kernel ridge regression |        核岭回归        |
+|        regressor        |         回归量         |
+|      feed-forward       |          前馈          |
+|        iterative        |     迭代的、反复的     |
+|        shrinkage        |       收缩、减低       |
+|        threshold        |       门槛、阈值       |
+|      subsequently       |       随后、后来       |
+|         upscale         |       放大、提高       |
+|        recursive        |     递归的、循环的     |
 
