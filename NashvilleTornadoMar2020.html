@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>
+			NashvilleTornadoMar2020
+		</title>
+		<!-- arcgis api -->
+		<link rel="stylesheet" href="https://js.arcgis.com/4.17/esri/themes/light/main.css" />
+		<script src="https://js.arcgis.com/4.17/"></script>
+		<style>
+			html,
+			body {
+			  padding: 0;
+			  margin: 0;
+			  height: 100%;
+			  width: 100%;
+			}
+			#viewDiv {
+				padding: 0;
+				margin: 0;
+				height: 100%;
+				width: 100%;
+				float: left;
+			}
+			#layer-control{
+				width: 300px;
+				font-family: Avenir Next W00;
+				font-size: 1em;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Map -->
+		<div id="viewDiv"></div>
+
+		<!-- Layer Control  -->
+		<form id="layer-control" class="esri-widget">
+			<input type="checkbox" id="Wilson_layer" >Wilson Parcel and Damage<br />
+			<input type="checkbox" id="Putnam_layer" >Putnam Parcel and Damage<br />
+		</form>
+
+		<script>
+			require([
+				"esri/Map",
+				"esri/views/MapView",
+				"esri/layers/FeatureLayer",
+				"esri/widgets/Legend",
+				"esri/widgets/BasemapToggle",
+				"esri/layers/TileLayer"
+			], function(
+				Map,
+				MapView,
+				FeatureLayer,
+				Legend,
+				BasemapToggle,
+				TileLayer
+			) {
+				const map = new Map({
+					basemap: "topo-vector"
+				});
+
+				const view = new MapView({
+					container: "viewDiv",
+					map: map,
+					center: [-86, 36.10], // longitude, latitude
+					zoom: 10
+				});
+
+				//Layers
+				let Wilson_layer = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Wilson_Parcel_and_Damage/MapServer",
+					layerId: 0,
+					opacity: 0,
+					legendEnabled: false,
+					popupEnabled: false
+				});
+				
+				
+				let Putnam_layer = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Putnam_Parcel_and_Damage/MapServer",
+					layerId: 1,
+					opacity: 0,
+					legendEnabled: false,
+					popupEnabled: false
+				});
+				
+				//add layers to map
+				map.add(Putnam_layer)
+				map.add(Wilson_layer)
+
+				// Set up UI elements
+				view.ui.add(new Legend({
+					view: view
+				}), "bottom-left");
+				view.ui.add("layer-control", "bottom-right");
+
+				// Generate a new renderer each time the user changes an input parameter
+				view.when().then(function() {
+					// switch layers using checkbox
+					layerControl = document.getElementById("layer-control");
+					layerControl.addEventListener("change", changeLayers);
+				});
+
+				// checkbox switch layers
+				function changeLayers() {
+					if (document.getElementById("Putnam_layer").checked) {
+						Putnam_layer.opacity = 1;
+						Putnam_layer.legendEnabled = true;
+						Putnam_layer.popupEnabled = true;
+					} else {
+						Putnam_layer.opacity = 0;
+						Putnam_layer.legendEnabled = false;
+						Putnam_layer.popupEnabled = false;
+					};
+					if (document.getElementById("Wilson_layer").checked) {
+						Wilson_layer.opacity = 1;
+						Wilson_layer.legendEnabled = true;
+						Wilson_layer.popupEnabled = true;
+					} else {
+						Wilson_layer.opacity = 0;
+						Wilson_layer.legendEnabled = false;
+						Wilson_layer.popupEnabled = false;
+					};
+				}
+
+			});
+		</script>
+	</body>
+</html>
