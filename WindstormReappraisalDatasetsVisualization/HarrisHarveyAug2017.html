@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>
+			Harris Harvey Aug 2017
+		</title>
+		<!-- arcgis api -->
+		<link rel="stylesheet" href="https://js.arcgis.com/4.17/esri/themes/light/main.css" />
+		<script src="https://js.arcgis.com/4.17/"></script>
+		<style>
+			html,
+			body {
+			  padding: 0;
+			  margin: 0;
+			  height: 100%;
+			  width: 100%;
+			}
+			#viewDiv {
+				padding: 0;
+				margin: 0;
+				height: 100%;
+				width: 100%;
+				float: left;
+			}
+			#layer-control{
+				width: 300px;
+				font-family: Avenir Next W00;
+				font-size: 1em;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Map -->
+		<div id="viewDiv"></div>
+
+		<!-- Layer Control  -->
+		<form id="layer-control" class="esri-widget">
+			<input type="checkbox" id="layer_HCADParcels2017" >HCAD Parcels<br />
+			<input type="checkbox" id="layer_HCADCommercialDamaged" >HCAD Commercial Damaged<br />
+			<input type="checkbox" id="layer_HCADResidentialDamaged" >HCAD Residential Damaged<br />
+		</form>
+
+		<script>
+			require([
+				"esri/Map",
+				"esri/views/MapView",
+				"esri/layers/FeatureLayer",
+				"esri/widgets/Legend",
+				"esri/widgets/BasemapToggle",
+				"esri/layers/TileLayer"
+			], function(
+				Map,
+				MapView,
+				FeatureLayer,
+				Legend,
+				BasemapToggle,
+				TileLayer
+			) {
+				const map = new Map({
+					basemap: "topo-vector"
+				});
+
+				const view = new MapView({
+					container: "viewDiv",
+					map: map,
+					center: [-95.3, 29.8], // longitude, latitude
+					zoom: 10
+				});
+
+				//Layers
+				let layer_HCADParcels2017 = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Harris_HCAD_Parcels_2017/MapServer",
+					opacity: 0,
+					legendEnabled: false,
+					popupEnabled: false
+				});
+				let layer_HCADCommercialDamaged = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Harris_HCAD_Commercial_Damaged_by_Harvey/MapServer",
+					opacity: 0,
+					legendEnabled: false,
+					popupEnabled: false
+				});
+				let layer_HCADResidentialDamaged = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Harris_HCAD_Residential_Damaged_by_Harvey2/MapServer",
+					opacity: 0,
+					legendEnabled: false,
+					popupEnabled: false
+				});
+				
+
+				//add layers to map
+				map.add(layer_HCADResidentialDamaged)
+				map.add(layer_HCADCommercialDamaged)
+				map.add(layer_HCADParcels2017)
+
+				// Set up UI elements
+				view.ui.add(new Legend({
+					view: view
+				}), "bottom-left");
+				view.ui.add("layer-control", "bottom-right");
+
+				// Generate a new renderer each time the user changes an input parameter
+				view.when().then(function() {
+					// switch layers using checkbox
+					layerControl = document.getElementById("layer-control");
+					layerControl.addEventListener("change", changeLayers);
+				});
+
+				// checkbox switch layers
+				function changeLayers() {
+					if (document.getElementById("layer_HCADParcels2017").checked) {
+						layer_HCADParcels2017.opacity = 1;
+						layer_HCADParcels2017.legendEnabled = true;
+						layer_HCADParcels2017.popupEnabled = true;
+					} else {
+						layer_HCADParcels2017.opacity = 0;
+						layer_HCADParcels2017.legendEnabled = false;
+						layer_HCADParcels2017.popupEnabled = false;
+					};
+					if (document.getElementById("layer_HCADCommercialDamaged").checked) {
+						layer_HCADCommercialDamaged.opacity = 1;
+						layer_HCADCommercialDamaged.legendEnabled = true;
+						layer_HCADCommercialDamaged.popupEnabled = true;
+					} else {
+						layer_HCADCommercialDamaged.opacity = 0;
+						layer_HCADCommercialDamaged.legendEnabled = false;
+						layer_HCADCommercialDamaged.popupEnabled = false;
+					};
+					if (document.getElementById("layer_HCADResidentialDamaged").checked) {
+						layer_HCADResidentialDamaged.opacity = 1;
+						layer_HCADResidentialDamaged.legendEnabled = true;
+						layer_HCADResidentialDamaged.popupEnabled = true;
+					} else {
+						layer_HCADResidentialDamaged.opacity = 0;
+						layer_HCADResidentialDamaged.legendEnabled = false;
+						layer_HCADResidentialDamaged.popupEnabled = false;
+					};
+				}
+
+			});
+		</script>
+	</body>
+</html>
