@@ -1,0 +1,231 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+		<title>Nashville Tornado Mar 2020</title>
+
+		<link rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css" />
+
+		<style>
+			html,
+			body,
+			#viewDiv {
+				padding: 0;
+				margin: 0;
+				height: 100%;
+				width: 100%;
+				overflow: hidden;
+			}
+		</style>
+
+		<script src="https://js.arcgis.com/4.19/"></script>
+
+		<script>
+			require(["esri/views/SceneView", "esri/widgets/LayerList", "esri/WebScene", "esri/Map",
+				"esri/views/MapView",
+				"esri/layers/FeatureLayer",
+				"esri/widgets/Legend",
+				"esri/widgets/BasemapToggle",
+				"esri/layers/TileLayer",
+				"esri/layers/GroupLayer",
+				"esri/widgets/Popup",
+				"esri/layers/KMLLayer"
+			], function(
+				SceneView,
+				LayerList,
+				WebScene,
+				Map,
+				MapView,
+				FeatureLayer,
+				Legend,
+				BasemapToggle,
+				TileLayer,
+				GroupLayer,
+				Popup,
+				KMLLayer
+			) {
+
+				const map = new Map({
+					basemap: "topo-vector"
+				});
+
+				const view = new MapView({
+					container: "viewDiv",
+					map: map,
+					center: [-86, 36.10], // longitude, latitude
+					zoom: 10
+				});
+
+				//Layers
+
+				//Damage Parcel
+				let Wilson_layer = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Wilson_Parcel_and_Damage/MapServer",
+					layerId: 0,
+					title:"Wilson Parcel and Damage"
+				});
+				let Putnam_layer = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Putnam_Parcel_and_Damage/MapServer",
+					layerId: 1,
+					title:"Putnam Parcel and Damage"
+				});
+				
+				// Track Data
+				
+				//Kml
+				const NashvilleStormDamageFeatures = new KMLLayer({
+					portalItem: { // autocasts as new PortalItem()
+						id: "3be72e1371f24a07913575b4642ff31c"
+					},
+					title: "Nashville Tornado Trajectory(kml)",
+					visible :false
+				})
+				
+				//FeatureLayer
+				let Cookeville_1 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Cookeville_1/FeatureServer";
+				let Cookeville_1_DamagePoints = new FeatureLayer({
+					url: Cookeville_1,
+					layerId: 3,
+					title: "DamagePoints"
+				});
+				let Cookeville_1_DamagePaths = new FeatureLayer({
+					url: Cookeville_1,
+					layerId: 4,
+					title: "DamagePaths"
+				});
+				let Cookeville_1_DamagePolys = new FeatureLayer({
+					url: Cookeville_1,
+					layerId: 5,
+					title: "DamagePolys"
+				});
+				var GroupLayer_Cookeville_1 = new GroupLayer({
+					title: "Nashville Tornado Trajectory: Cookeville_1",
+					visible: false,
+					visibilityMode: "independent",
+					layers: [Cookeville_1_DamagePolys, Cookeville_1_DamagePaths, Cookeville_1_DamagePoints]
+				});
+				
+				let Nashvile_1 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_1/FeatureServer";
+				let Nashvile_1_DamagePoints = new FeatureLayer({
+					url: Nashvile_1,
+					layerId: 2,
+					title: "DamagePoints"
+				});
+				let Nashvile_1_DamagePaths = new FeatureLayer({
+					url: Nashvile_1,
+					layerId: 3,
+					title: "DamagePaths"
+				});
+				let Nashvile_1_DamagePolys = new FeatureLayer({
+					url: Nashvile_1,
+					layerId: 4,
+					title: "DamagePolys"
+				});
+				var GroupLayer_Nashvile_1 = new GroupLayer({
+					title: "Nashville Tornado Trajectory: Nashvile_1",
+					visible: false,
+					visibilityMode: "independent",
+					layers: [Nashvile_1_DamagePolys, Nashvile_1_DamagePaths, Nashvile_1_DamagePoints]
+				});
+				
+				let Nashvile_2 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_2/FeatureServer";
+				let Nashvile_2_DamagePoints = new FeatureLayer({
+					url: Nashvile_2,
+					layerId: 3,
+					title: "DamagePoints"
+				});
+				let Nashvile_2_DamagePaths = new FeatureLayer({
+					url: Nashvile_2,
+					layerId: 4,
+					title: "DamagePaths"
+				});
+				let Nashvile_2_DamagePolys = new FeatureLayer({
+					url: Nashvile_2,
+					layerId: 5,
+					title: "DamagePolys"
+				});
+				var GroupLayer_Nashvile_2 = new GroupLayer({
+					title: "Nashville Tornado Trajectory: Nashvile_2",
+					visible: false,
+					visibilityMode: "independent",
+					layers: [Nashvile_2_DamagePolys, Nashvile_2_DamagePaths, Nashvile_2_DamagePoints]
+				});
+				
+				let Nashvile_3 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_3/FeatureServer";
+				let Nashvile_3_DamagePoints = new FeatureLayer({
+					url: Nashvile_3,
+					layerId: 3,
+					title: "DamagePoints"
+				});
+				let Nashvile_3_DamagePaths = new FeatureLayer({
+					url: Nashvile_3,
+					layerId: 4,
+					title: "DamagePaths"
+				});
+				let Nashvile_3_DamagePolys = new FeatureLayer({
+					url: Nashvile_3,
+					layerId: 5,
+					title: "DamagePolys"
+				});
+				var GroupLayer_Nashvile_3 = new GroupLayer({
+					title: "Nashville Tornado Trajectory: Nashvile_3",
+					visible: false,
+					visibilityMode: "independent",
+					layers: [Nashvile_3_DamagePolys, Nashvile_3_DamagePaths, Nashvile_3_DamagePoints]
+				});
+				
+				let Nashvile_4 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_4/FeatureServer";
+				let Nashvile_4_DamagePoints = new FeatureLayer({
+					url: Nashvile_4,
+					layerId: 2,
+					title: "DamagePoints"
+				});
+				let Nashvile_4_DamagePaths = new FeatureLayer({
+					url: Nashvile_4,
+					layerId: 3,
+					title: "DamagePaths"
+				});
+				let Nashvile_4_DamagePolys = new FeatureLayer({
+					url: Nashvile_4,
+					layerId: 4,
+					title: "DamagePolys"
+				});
+				var GroupLayer_Nashvile_4 = new GroupLayer({
+					title: "Nashville Tornado Trajectory: Nashvile_4",
+					visible: false,
+					visibilityMode: "independent",
+					layers: [Nashvile_4_DamagePolys, Nashvile_4_DamagePaths, Nashvile_4_DamagePoints]
+				});
+				
+				//add layers to map
+				map.add(GroupLayer_Cookeville_1);
+				map.add(GroupLayer_Nashvile_4)
+				map.add(GroupLayer_Nashvile_3)
+				map.add(GroupLayer_Nashvile_2)
+				map.add(GroupLayer_Nashvile_1)
+				map.add(NashvilleStormDamageFeatures);
+				map.add(Putnam_layer);
+				map.add(Wilson_layer);
+
+
+				// Add Legend widget to the bottom left corner of the view
+				view.ui.add(new Legend({
+					view: view
+				}), "bottom-left");
+
+				view.when(function() {
+					var layerList = new LayerList({
+						view: view
+					});
+
+					// Add layerList widget to the bottom right corner of the view
+					view.ui.add(layerList, "bottom-right");
+				});
+			});
+		</script>
+	</head>
+
+	<body class="calcite">
+		<div id="viewDiv"></div>
+	</body>
+</html>
