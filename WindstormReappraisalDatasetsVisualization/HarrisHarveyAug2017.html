@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>
+			Harris Harvey Aug 2017
+		</title>
+		<!-- arcgis api -->
+		<link rel="stylesheet" href="https://js.arcgis.com/4.17/esri/themes/light/main.css" />
+		<script src="https://js.arcgis.com/4.17/"></script>
+		<style>
+			html,
+			body {
+			  padding: 0;
+			  margin: 0;
+			  height: 100%;
+			  width: 100%;
+			}
+			#viewDiv {
+				padding: 0;
+				margin: 0;
+				height: 100%;
+				width: 100%;
+				float: left;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Map -->
+		<div id="viewDiv"></div>
+
+		<script>
+			require(["esri/views/SceneView", "esri/widgets/LayerList", "esri/WebScene", "esri/Map",
+				"esri/views/MapView",
+				"esri/layers/FeatureLayer",
+				"esri/widgets/Legend",
+				"esri/widgets/BasemapToggle",
+				"esri/layers/TileLayer",
+				"esri/layers/GroupLayer",
+				"esri/widgets/Popup",
+				"esri/layers/KMLLayer"
+			], function(
+				SceneView,
+				LayerList,
+				WebScene,
+				Map,
+				MapView,
+				FeatureLayer,
+				Legend,
+				BasemapToggle,
+				TileLayer,
+				GroupLayer,
+				Popup,
+				KMLLayer
+			) {
+				const map = new Map({
+					basemap: "topo-vector"
+				});
+
+				const view = new MapView({
+					container: "viewDiv",
+					map: map,
+					center: [-95.3, 29.8], // longitude, latitude
+					zoom: 10
+				});
+
+				//Layers
+				let layer_HCADParcels2017 = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Harris_HCAD_Parcels_2017/MapServer",
+				});
+				let layer_HCADCommercialDamaged = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Harris_HCAD_Commercial_Damaged_by_Harvey/MapServer",
+				});
+				let layer_HCADResidentialDamaged = new TileLayer({
+					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Harris_HCAD_Residential_Damaged_by_Harvey2/MapServer",
+				});
+				
+
+				//add layers to map
+				map.add(layer_HCADParcels2017)
+				map.add(layer_HCADResidentialDamaged)
+				map.add(layer_HCADCommercialDamaged)
+				
+				// Add Legend widget to the bottom left corner of the view
+				view.ui.add(new Legend({
+					view: view
+				}), "bottom-left");
+
+				view.when(function() {
+					var layerList = new LayerList({
+						view: view
+					});
+
+					// Add layerList widget to the bottom right corner of the view
+					view.ui.add(layerList, "bottom-right");
+				});
+
+			});
+		</script>
+	</body>
+</html>
