@@ -21,28 +21,25 @@
 		<script src="https://js.arcgis.com/4.19/"></script>
 
 		<script>
-			require(["esri/views/SceneView", "esri/widgets/LayerList", "esri/WebScene", "esri/Map",
+			require(["esri/widgets/LayerList",
+				"esri/Map",
 				"esri/views/MapView",
 				"esri/layers/FeatureLayer",
 				"esri/widgets/Legend",
-				"esri/widgets/BasemapToggle",
 				"esri/layers/TileLayer",
 				"esri/layers/GroupLayer",
 				"esri/widgets/Popup",
-				"esri/layers/KMLLayer"
+				"esri/layers/support/LabelClass"
 			], function(
-				SceneView,
 				LayerList,
-				WebScene,
 				Map,
 				MapView,
 				FeatureLayer,
 				Legend,
-				BasemapToggle,
 				TileLayer,
 				GroupLayer,
 				Popup,
-				KMLLayer
+				LabelClass
 			) {
 
 				const map = new Map({
@@ -57,14 +54,6 @@
 				});
 
 				//Layers
-				
-				const DallasStormDamageFeatures = new KMLLayer({
-				  portalItem: {  // autocasts as new PortalItem()
-				    id: "ef08c8eb9ca2442fb79c3c442e42511b"
-				  },
-				  title: "Dallas Tornado Trajectory(kml)",
-				  visible :false
-				})
 
 				let Dallas_layer = new TileLayer({
 					url: "https://tiles.arcgis.com/tiles/4aUxCaDLaSFPHO9o/arcgis/rest/services/Dallas_Parcel_and_Damage2020_Tile/MapServer",
@@ -72,69 +61,62 @@
 					title: "Dallas Parcel and Damage 2020"
 				});
 
-				let DallasTornadoTrajectory =
-					"https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/DallasTornadoTrajectory/FeatureServer";
-
-				let DamagePoints = new FeatureLayer({
-					url: DallasTornadoTrajectory,
-					layerId: 0,
-					title: "DamagePoints"
-				});
-				let DamagePaths = new FeatureLayer({
-					url: DallasTornadoTrajectory,
-					layerId: 1,
-					title: "DamagePaths"
-				});
-				let DamagePolys = new FeatureLayer({
-					url: DallasTornadoTrajectory,
-					layerId: 2,
-					title: "DamagePolys"
-				});
-
-				var GroupLayer_track = new GroupLayer({
-					title: "Dallas Tornado Trajectory",
-					visible: false,
-					visibilityMode: "independent",
-					layers: [DamagePolys, DamagePaths, DamagePoints]
-				});
-				
 				//kml
-				// let DallasStormDamageFeatures_kmzToLayer =
-				// 	"https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Dallas_Storm_Damage_Features_kmzToLayer_/FeatureServer";
+				const template = {
+					title: "{NAME}",
+					content: "{PopupInfo}"
+				};
 				
-				// let Points = new FeatureLayer({
-				// 	url: DallasStormDamageFeatures_kmzToLayer,
-				// 	layerId: 1,
-				// 	title: "Points"
-				// });
-				// let Polylines = new FeatureLayer({
-				// 	url: DallasStormDamageFeatures_kmzToLayer,
-				// 	layerId: 2,
-				// 	title: "Polylines"
-				// });
-				// let Polygons = new FeatureLayer({
-				// 	url: DallasStormDamageFeatures_kmzToLayer,
-				// 	layerId: 3,
-				// 	title: "Polygons"
-				// });
-				
-				// var GroupLayer_kml = new GroupLayer({
-				// 	title: "Dallas Tornado Trajectory(kml)",
-				// 	visible: false,
-				// 	visibilityMode: "independent",
-				// 	layers: [ Polygons, Polylines, Points]
-				// });
+				const statesLabelClass = new LabelClass({
+					labelExpressionInfo: {
+						expression: "$feature.NAME"
+					},
+					symbol: {
+						type: "text", // autocasts as new TextSymbol()
+						color: "black",
+						haloSize: 1,
+						haloColor: "white"
+					}
+				});
 
+				let DallasTornadoTrajectory_kmzToLayer = "b887473c52b84020a6d36c4e11358ae5";
 
-				//add layers to map
-				
-				
-				// map.add(GroupLayer_kml)
-				
-				map.add(GroupLayer_track)
-				map.add(DallasStormDamageFeatures);
+				let Points = new FeatureLayer({
+					portalItem: {
+						id: DallasTornadoTrajectory_kmzToLayer
+					},
+					layerId: 2,
+					title: "Points",
+					labelingInfo: statesLabelClass,
+					popupTemplate: template
+				});
+
+				let Polylines = new FeatureLayer({
+					portalItem: {
+						id: DallasTornadoTrajectory_kmzToLayer
+					},
+					layerId: 3,
+					title: "Polylines",
+					popupTemplate: template
+				});
+				let Polygons = new FeatureLayer({
+					portalItem: {
+						id: DallasTornadoTrajectory_kmzToLayer
+					},
+					layerId: 4,
+					title: "Polygons",
+					popupTemplate: template
+				});
+
+				var GroupLayer_kml = new GroupLayer({
+					title: "Dallas Tornado Trajectory(kml)",
+					visible: true,
+					visibilityMode: "independent",
+					layers: [Polygons, Polylines, Points]
+				});
+
+				map.add(GroupLayer_kml)
 				map.add(Dallas_layer)
-				
 
 				// Add Legend widget to the bottom left corner of the view
 				view.ui.add(new Legend({
@@ -145,7 +127,7 @@
 					var layerList = new LayerList({
 						view: view
 					});
-					
+
 					// Add layerList widget to the bottom right corner of the view
 					view.ui.add(layerList, "bottom-right");
 				});

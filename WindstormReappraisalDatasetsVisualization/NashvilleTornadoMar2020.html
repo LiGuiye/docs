@@ -21,28 +21,25 @@
 		<script src="https://js.arcgis.com/4.19/"></script>
 
 		<script>
-			require(["esri/views/SceneView", "esri/widgets/LayerList", "esri/WebScene", "esri/Map",
+			require(["esri/widgets/LayerList",
+				"esri/Map",
 				"esri/views/MapView",
 				"esri/layers/FeatureLayer",
 				"esri/widgets/Legend",
-				"esri/widgets/BasemapToggle",
 				"esri/layers/TileLayer",
 				"esri/layers/GroupLayer",
 				"esri/widgets/Popup",
-				"esri/layers/KMLLayer"
+				"esri/layers/support/LabelClass"
 			], function(
-				SceneView,
 				LayerList,
-				WebScene,
 				Map,
 				MapView,
 				FeatureLayer,
 				Legend,
-				BasemapToggle,
 				TileLayer,
 				GroupLayer,
 				Popup,
-				KMLLayer
+				LabelClass
 			) {
 
 				const map = new Map({
@@ -71,139 +68,55 @@
 				});
 				
 				// Track Data
+				//kml
+				const template = {
+					title: "{NAME}",
+					content: "{PopupInfo}"
+				};
 				
-				//Kml
-				const NashvilleStormDamageFeatures = new KMLLayer({
-					portalItem: { // autocasts as new PortalItem()
-						id: "3be72e1371f24a07913575b4642ff31c"
+				const statesLabelClass = new LabelClass({
+					labelExpressionInfo: {
+						expression: "$feature.NAME"
 					},
+					symbol: {
+						type: "text", // autocasts as new TextSymbol()
+						color: "black",
+						haloSize: 1,
+						haloColor: "white"
+					}
+				});
+				
+				let NashvilleCokevilleTornadoTrajectory_kmzToLayer = "5aa7ebf49bcc47118164c4a71bee08d0";
+				
+				let Points = new FeatureLayer({
+					portalItem: {
+						id: NashvilleCokevilleTornadoTrajectory_kmzToLayer
+					},
+					layerId: 2,
+					title: "Points",
+					labelingInfo: statesLabelClass,
+					popupTemplate: template
+				});
+				
+				let Polylines = new FeatureLayer({
+					portalItem: {
+						id: NashvilleCokevilleTornadoTrajectory_kmzToLayer
+					},
+					layerId: 3,
+					title: "Polylines",
+					popupTemplate: template
+				});
+
+				
+				var GroupLayer_kml = new GroupLayer({
 					title: "Nashville Tornado Trajectory(kml)",
-					visible :false
-				})
-				
-				//FeatureLayer
-				let Cookeville_1 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Cookeville_1/FeatureServer";
-				let Cookeville_1_DamagePoints = new FeatureLayer({
-					url: Cookeville_1,
-					layerId: 3,
-					title: "DamagePoints"
-				});
-				let Cookeville_1_DamagePaths = new FeatureLayer({
-					url: Cookeville_1,
-					layerId: 4,
-					title: "DamagePaths"
-				});
-				let Cookeville_1_DamagePolys = new FeatureLayer({
-					url: Cookeville_1,
-					layerId: 5,
-					title: "DamagePolys"
-				});
-				var GroupLayer_Cookeville_1 = new GroupLayer({
-					title: "Nashville Tornado Trajectory: Cookeville_1",
-					visible: false,
+					visible: true,
 					visibilityMode: "independent",
-					layers: [Cookeville_1_DamagePolys, Cookeville_1_DamagePaths, Cookeville_1_DamagePoints]
-				});
-				
-				let Nashvile_1 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_1/FeatureServer";
-				let Nashvile_1_DamagePoints = new FeatureLayer({
-					url: Nashvile_1,
-					layerId: 2,
-					title: "DamagePoints"
-				});
-				let Nashvile_1_DamagePaths = new FeatureLayer({
-					url: Nashvile_1,
-					layerId: 3,
-					title: "DamagePaths"
-				});
-				let Nashvile_1_DamagePolys = new FeatureLayer({
-					url: Nashvile_1,
-					layerId: 4,
-					title: "DamagePolys"
-				});
-				var GroupLayer_Nashvile_1 = new GroupLayer({
-					title: "Nashville Tornado Trajectory: Nashvile_1",
-					visible: false,
-					visibilityMode: "independent",
-					layers: [Nashvile_1_DamagePolys, Nashvile_1_DamagePaths, Nashvile_1_DamagePoints]
-				});
-				
-				let Nashvile_2 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_2/FeatureServer";
-				let Nashvile_2_DamagePoints = new FeatureLayer({
-					url: Nashvile_2,
-					layerId: 3,
-					title: "DamagePoints"
-				});
-				let Nashvile_2_DamagePaths = new FeatureLayer({
-					url: Nashvile_2,
-					layerId: 4,
-					title: "DamagePaths"
-				});
-				let Nashvile_2_DamagePolys = new FeatureLayer({
-					url: Nashvile_2,
-					layerId: 5,
-					title: "DamagePolys"
-				});
-				var GroupLayer_Nashvile_2 = new GroupLayer({
-					title: "Nashville Tornado Trajectory: Nashvile_2",
-					visible: false,
-					visibilityMode: "independent",
-					layers: [Nashvile_2_DamagePolys, Nashvile_2_DamagePaths, Nashvile_2_DamagePoints]
-				});
-				
-				let Nashvile_3 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_3/FeatureServer";
-				let Nashvile_3_DamagePoints = new FeatureLayer({
-					url: Nashvile_3,
-					layerId: 3,
-					title: "DamagePoints"
-				});
-				let Nashvile_3_DamagePaths = new FeatureLayer({
-					url: Nashvile_3,
-					layerId: 4,
-					title: "DamagePaths"
-				});
-				let Nashvile_3_DamagePolys = new FeatureLayer({
-					url: Nashvile_3,
-					layerId: 5,
-					title: "DamagePolys"
-				});
-				var GroupLayer_Nashvile_3 = new GroupLayer({
-					title: "Nashville Tornado Trajectory: Nashvile_3",
-					visible: false,
-					visibilityMode: "independent",
-					layers: [Nashvile_3_DamagePolys, Nashvile_3_DamagePaths, Nashvile_3_DamagePoints]
-				});
-				
-				let Nashvile_4 = "https://services2.arcgis.com/4aUxCaDLaSFPHO9o/arcgis/rest/services/Nashvile_4/FeatureServer";
-				let Nashvile_4_DamagePoints = new FeatureLayer({
-					url: Nashvile_4,
-					layerId: 2,
-					title: "DamagePoints"
-				});
-				let Nashvile_4_DamagePaths = new FeatureLayer({
-					url: Nashvile_4,
-					layerId: 3,
-					title: "DamagePaths"
-				});
-				let Nashvile_4_DamagePolys = new FeatureLayer({
-					url: Nashvile_4,
-					layerId: 4,
-					title: "DamagePolys"
-				});
-				var GroupLayer_Nashvile_4 = new GroupLayer({
-					title: "Nashville Tornado Trajectory: Nashvile_4",
-					visible: false,
-					visibilityMode: "independent",
-					layers: [Nashvile_4_DamagePolys, Nashvile_4_DamagePaths, Nashvile_4_DamagePoints]
+					layers: [Polylines, Points]
 				});
 				
 				//add layers to map
-				map.add(GroupLayer_Cookeville_1);
-				map.add(GroupLayer_Nashvile_4)
-				map.add(GroupLayer_Nashvile_3)
-				map.add(GroupLayer_Nashvile_2)
-				map.add(GroupLayer_Nashvile_1)
-				map.add(NashvilleStormDamageFeatures);
+				map.add(GroupLayer_kml);
 				map.add(Putnam_layer);
 				map.add(Wilson_layer);
 
